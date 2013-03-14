@@ -326,16 +326,16 @@ if play:
      
     elif section == 'latestmovies':
         #Search within HTML to only get portion of links specific to movie name
-        # TO DO - currently does not return enough of the header for the first link
-        r = re.search('<div>%s</div>(.+?)(<div>(?!%s)|<p align="center">)' % (title, title), html, re.DOTALL)
+        # TO DO - currently does not return enough of the header for the first link, mod the title so special regex chars are escaped
+        r = re.search('<div>%s</div>(.+?)(<div>(?!%s)|<p align="center">)' % (re.escape(title), re.escape(title)), html, re.DOTALL)
         if r:
             html = r.group(0)
         else:
             html = ''
     
     elif section in ('tvshows', 'episode'):
-        #Search within HTML to only get portion of links specific to episode requested
-        r = re.search('<td class="episode"><a name=".+?"></a><b>%s</b>(.+?)(<a name=|<p align="center">)' % name, html, re.DOTALL)
+        #Search within HTML to only get portion of links specific to episode requested, mod the episode name so special regex chars are escaped
+        r = re.search('<td class="episode"><a name=".+?"></a><b>%s</b>(.+?)(<a name=|<p align="center">)' % re.escape(name), html, re.DOTALL)
         if r:
             html = r.group(1)
         else:
