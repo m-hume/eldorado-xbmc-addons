@@ -160,6 +160,27 @@ def refresh_movie(vidtitle, year=''):
         addon.show_ok_dialog(msg, 'Refresh Results')
 
 
+def refresh_tv(title, imdb_id):
+
+    metaget=metahandlers.MetaData()      
+    show_list = metaget.get_tvdb_list(title)       
+    name_list = []
+    filtered_show_list = []
+    for show in show_list:
+        (seriesid, SeriesName, IMDB_ID) = show
+        if IMDB_ID != None:
+            filtered_show_list.append([seriesid, SeriesName, IMDB_ID])
+            name_list.append(SeriesName)
+
+    dialog = xbmcgui.Dialog()
+    index = dialog.select('Choose', name_list)
+ 
+    if index > -1:
+        metaget.update_meta('tvshow', title, imdb_id, new_tmdb_id=filtered_show_list[index][0], new_imdb_id=filtered_show_list[index][2])
+        xbmc.executebuiltin("Container.Refresh")
+        Notify('small', 'Updated Metadata', filtered_show_list[index][1],'')
+
+
 def episode_refresh(vidname, imdb, season_num, episode_num):
     #refresh info for an episode   
 
@@ -615,7 +636,7 @@ elif mode == 'refresh_meta':
         refresh_movie(title)
 
     elif video_type == VideoType_TV:
-        Notify('small', 'Refresh TV Show', 'Feature not yet implemented','')
+        refresh_tv(title, imdb_id)
     elif video_type == VideoType_Season:
         season_refresh(title, imdb_id, season)
     elif video_type == VideoType_Episode:
