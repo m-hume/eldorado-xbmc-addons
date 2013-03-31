@@ -540,7 +540,7 @@ elif mode == 'tvseasons':
 
 elif mode == 'tvepisodes':
     html = net.http_GET(url).content.encode('utf-8')
-    match = re.compile('<td class="episode"><a name=".+?"></a>(.*?)<b>(.+?)</b></td>[\r\n\t]*(<td align="right".+?;Air Date: (.+?)</div>)*', re.DOTALL).findall(html)
+    match = re.compile('<td class="episode"><a name=".+?"></a>(.*?)<b>(.+?)</b></td>[\r\n\t]*(<td align="right".+?;Air Date: (.*?)</div>)*', re.DOTALL).findall(html)
     for next_episode, vidname, empty, next_air in match:
         episode_num = re.search('([0-9]{0,2})\.', vidname)
         if episode_num:
@@ -551,7 +551,8 @@ elif mode == 'tvepisodes':
             add_video_item(VideoType_Episode, VideoType_Episode, url, title, vidname, imdb=imdb_id, season_num=season, episode_num=episode_num, totalitems=len(match))
         else:
             meta = get_metadata(VideoType_Episode, title, vidname, imdb=imdb_id, season_num=season, episode_num=episode_num)
-            meta['title'] = '[COLOR blue]Next Episode: %s - %s[/COLOR]' % (next_air, vidname)
+            if next_air: next_air += ' - '
+            meta['title'] = '[COLOR blue]Next Episode: %s%s[/COLOR]' % (next_air, vidname)
             addon.add_directory({'mode': 'none'}, meta, is_folder=False, img=meta['cover_url'], fanart=meta['backdrop_url'])            
     setView('episodes', 'episode-view')
     
