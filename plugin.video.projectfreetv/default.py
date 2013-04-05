@@ -1,8 +1,8 @@
 import xbmc, xbmcgui, xbmcplugin
 import urllib
 import re, string
-from addon.common.addon import Addon
-from addon.common.net import Net
+from t0mm0.common.addonNEW import Addon
+from t0mm0.common.net import Net
 import urlresolver
 from metahandler import metahandlers
 
@@ -170,7 +170,7 @@ def episode_refresh(vidname, imdb, season_num, episode_num):
 
 def season_refresh(vidname, imdb, season_num):
 
-    metaget=metahandlers.MetaData()          	
+    metaget=metahandlers.MetaData()            
     metaget.update_season(vidname, imdb, season_num)
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
@@ -388,7 +388,8 @@ if mode == 'main':
 
 elif mode == 'movies':
     addon.add_directory({'mode': 'moviesaz', 'section': 'moviesaz'}, {'title': 'A-Z'}, img=IconPath + "AZ.png")
-    addon.add_directory({'mode': 'moviespopular', 'section': 'moviespopular'}, {'title': 'Popular'})
+    # Popular movies are not currently listed
+    # addon.add_directory({'mode': 'moviespopular', 'section': 'moviespopular'}, {'title': 'Popular'})
     addon.add_directory({'mode': 'favourites', 'video_type': VideoType_Movies}, {'title': 'Favourites'})
     addon.add_directory({'mode': 'search', 'section': SearchMovies}, {'title': 'Search'})
     addon.add_directory({'mode': 'movieslatest', 'section': 'movieslatest'}, {'title': 'Latest Added Links'})
@@ -435,7 +436,7 @@ elif mode == 'movieslatest':
 
 
 elif mode == 'moviespopular':
-
+    # not currently available
     if meta_setting:
         metaget=metahandlers.MetaData()
     else:
@@ -542,7 +543,7 @@ elif mode == 'tvpopular':
         
     url = MainUrl
     html = net.http_GET(url).content
-    match = re.compile('<td align="center"><a href="(.+?)">(.+?)</a></td>').findall(html)
+    match = re.compile('<td class="tleft".*?><a href="(.+?)/">(.+?)</a></td>').findall(html)
     for link, vidname in match:
         is_tv = re.search('/internet/', link)
         if vidname != "...more" and is_tv:
@@ -619,6 +620,7 @@ elif mode == 'search':
     else:
         metaget=None
 
+    index = 0
     search_text = ""
     search_list = []
     new_search = False
@@ -626,7 +628,10 @@ elif mode == 'search':
     
     #Convert returned string back into a list
     if search_hist:
-        search_list = eval(search_hist)
+        try:
+            search_list = eval(search_hist)
+        except:
+            search_list.insert(0, search_hist)
 
     #If we have historical search items, prompt the user with list
     if search_list:
